@@ -25,7 +25,7 @@ def check_bound(rct: pg.Rect) -> tuple[bool,bool]:
         yoko = False
     if rct.top < 0 or HEIGHT < rct.bottom: # 縦方向のチェック
         tate = False
-    return (yoko,tate)
+    return yoko,tate
 
 
 def main():
@@ -37,6 +37,8 @@ def main():
     bb_img.set_colorkey((0,0,0))
     bb_rect = bb_img.get_rect()
     bb_rect.center = random.randint(0,WIDTH),random.randint(0,HEIGHT)
+    vx = +5  # 爆弾の横速度
+    vy = +5  # 爆弾の縦速度
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
@@ -46,6 +48,11 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
+            
+        if kk_rct.colliderect(bb_rect):  # こうかとんと爆弾が衝突
+            print("ゲームオーバー")
+            return
+        
         screen.blit(bg_img, [0, 0])
 
         key_lst = pg.key.get_pressed()
@@ -67,15 +74,13 @@ def main():
         if check_bound(kk_rct) != (True,True):  # 画面外なら
             kk_rct.move_ip(-sum_mv[0],-sum_mv[1])  # 移動を無かったことにする
         screen.blit(kk_img, kk_rct)
-        vx = +5  # 爆弾の横速度
-        vy = +5  # 爆弾の縦速度
-        bb_rect.move_ip(vx,vy)
         yoko,tate = check_bound(bb_rect)
         if not yoko:  # 横画面外なら
             vx *= -1  # 反射
         if not tate:  # 縦画面外なら
             vy *= -1  # 反射
         screen.blit(bb_img,bb_rect)
+        bb_rect.move_ip(vx,vy)
         pg.display.update()
         tmr += 1
         clock.tick(50)
