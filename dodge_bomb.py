@@ -151,8 +151,8 @@ def main():
         if not tate:  # 縦画面外なら
             vy *= -1  # 反射
         # 加速度を得る
-        avx = vx*bb_accs[min(tmr//500, 9)]
-        avy = vy*bb_accs[min(tmr//500, 9)]
+        avx = vx*bb_accs[min(tmr//150, 9)]
+        avy = vy*bb_accs[min(tmr//150, 9)]
         # widthとheight属性の更新
         bb_rect.width = bb_img.get_rect().width
         bb_rect.height = bb_img.get_rect().height
