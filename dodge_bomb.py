@@ -54,14 +54,30 @@ def gameover(scr: pg.Surface) -> None:
     time.sleep(5)
 
 
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    """
+    引数:なし
+    戻り値:爆弾surfaceのタプル、加速度のタプル
+    """
+    bb_imgs = []
+    for r in range(1,11):
+        bb_img = pg.Surface((20*r, 20*r))
+        pg.draw.circle(bb_img,(255,0,0),(10*r,10*r),10*r)
+        bb_img.set_colorkey((0,0,0))
+        bb_imgs.append(bb_img)
+    bb_accs = [a for a in range(1,11)]
+    return tuple(bb_imgs),tuple(bb_accs)
+
+
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")
-    bb_img = pg.Surface((20,20))
-    pg.draw.circle(bb_img,(255,0,0),(10,10),10)
-    bb_img.set_colorkey((0,0,0))
+    # bb_img = pg.Surface((20,20))
+    # pg.draw.circle(bb_img,(255,0,0),(10,10),10)
+    bb_imgs,bb_accs = init_bb_imgs()  # 大きさの違う爆弾と加速度のタプルを得る
+    bb_img = bb_imgs[0]  # 爆弾の初期状態
     bb_rect = bb_img.get_rect()
     bb_rect.center = random.randint(0,WIDTH),random.randint(0,HEIGHT)
     vx = +5  # 爆弾の横速度
@@ -77,6 +93,7 @@ def main():
                 return
             
         if kk_rct.colliderect(bb_rect):  # こうかとんと爆弾が衝突
+            print("ゲームオーバー")
             gameover(screen)
             return
         
@@ -101,13 +118,22 @@ def main():
         if check_bound(kk_rct) != (True,True):  # 画面外なら
             kk_rct.move_ip(-sum_mv[0],-sum_mv[1])  # 移動を無かったことにする
         screen.blit(kk_img, kk_rct)
+
+        # 大きさの違う爆弾を得る
+        bb_img = bb_imgs[min(tmr//500, 9)]
         yoko,tate = check_bound(bb_rect)
         if not yoko:  # 横画面外なら
             vx *= -1  # 反射
         if not tate:  # 縦画面外なら
             vy *= -1  # 反射
+        # 加速度を得る
+        avx = vx*bb_accs[min(tmr//500, 9)]
+        avy = vy*bb_accs[min(tmr//500, 9)]
+        # widthとheight属性の更新
+        bb_rect.width = bb_img.get_rect().width
+        bb_rect.height = bb_img.get_rect().height
         screen.blit(bb_img,bb_rect)
-        bb_rect.move_ip(vx,vy)
+        bb_rect.move_ip(avx,avy)
         pg.display.update()
         tmr += 1
         clock.tick(50)
