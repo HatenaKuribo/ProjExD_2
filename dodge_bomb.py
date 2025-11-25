@@ -1,6 +1,7 @@
 import os
 import random
 import sys
+import time
 import pygame as pg
 
 
@@ -28,6 +29,32 @@ def check_bound(rct: pg.Rect) -> tuple[bool,bool]:
     return yoko,tate
 
 
+def gameover(scr: pg.Surface) -> None:
+    """
+    引数:screenのsurface
+    戻り値:無し
+    画面変更後5秒待つ
+    """
+    # 黒背景のsurface設定
+    black_img = pg.Surface((WIDTH, HEIGHT))
+    pg.draw.rect(black_img, (0,0,0),(0,0,WIDTH,HEIGHT))
+    black_img.set_alpha(200)
+    # 文字の設定
+    fonto = pg.font.Font(None, 80)
+    txt = fonto.render("GameOver",True,(255,255,255))
+    black_img.blit(txt, [450,325])
+    # こうかとんの画像設定
+    kk_img = pg.image.load("fig/8.png")
+    black_img.blit(kk_img, [400,325])
+    black_img.blit(kk_img,[750,325])
+    # 画面変更
+    scr.blit(black_img,[0,0])
+    pg.display.update()
+    # 5秒待つ
+    time.sleep(5)
+
+
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -50,7 +77,7 @@ def main():
                 return
             
         if kk_rct.colliderect(bb_rect):  # こうかとんと爆弾が衝突
-            print("ゲームオーバー")
+            gameover(screen)
             return
         
         screen.blit(bg_img, [0, 0])
