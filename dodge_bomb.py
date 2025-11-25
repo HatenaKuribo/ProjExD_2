@@ -69,6 +69,25 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
     return tuple(bb_imgs),tuple(bb_accs)
 
 
+def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
+    """
+    引数:なし
+    戻り値:こうかとんの移動方向をkeyとした時の値が画像Surfaceの辞書
+    """
+    kk_img0 = pg.image.load("fig/3.png")
+    kk_imgs = {
+        (0, 0): pg.transform.rotozoom(kk_img0, 0, 0.9),    # 静止
+        (+5, 0): pg.transform.flip(pg.transform.rotozoom(kk_img0, 0, 0.9), True, False),  # 左
+        (-5, 0): pg.transform.rotozoom(kk_img0, 0, 0.9),   # 右
+        (0, -5): pg.transform.rotozoom(kk_img0, 90, 0.9),  # 上
+        (0, +5): pg.transform.rotozoom(kk_img0, -90, 0.9), # 下
+        (+5, -5): pg.transform.rotozoom(kk_img0, 45, 0.9), # 右上
+        (+5, +5): pg.transform.rotozoom(kk_img0, -45, 0.9),# 右下
+        (-5, -5): pg.transform.rotozoom(pg.transform.flip(kk_img0, True, False), -45, 0.9), # 左上
+        (-5, +5): pg.transform.rotozoom(pg.transform.flip(kk_img0, True, False), 45, 0.9),  # 左下
+    }
+    return kk_imgs
+
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -82,7 +101,10 @@ def main():
     bb_rect.center = random.randint(0,WIDTH),random.randint(0,HEIGHT)
     vx = +5  # 爆弾の横速度
     vy = +5  # 爆弾の縦速度
-    kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    # kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    # kk_rct = kk_img.get_rect()
+    kk_imgs = get_kk_imgs()
+    kk_img = kk_imgs[(0,0)]
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
     clock = pg.time.Clock()
@@ -117,6 +139,8 @@ def main():
         kk_rct.move_ip(sum_mv)
         if check_bound(kk_rct) != (True,True):  # 画面外なら
             kk_rct.move_ip(-sum_mv[0],-sum_mv[1])  # 移動を無かったことにする
+
+        kk_img = kk_imgs[tuple(sum_mv)]
         screen.blit(kk_img, kk_rct)
 
         # 大きさの違う爆弾を得る
