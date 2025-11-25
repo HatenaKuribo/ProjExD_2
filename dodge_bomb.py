@@ -1,4 +1,5 @@
 import os
+import random
 import sys
 import pygame as pg
 
@@ -16,7 +17,12 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
-    bg_img = pg.image.load("fig/pg_bg.jpg")    
+    bg_img = pg.image.load("fig/pg_bg.jpg")
+    bb_img = pg.Surface((20,20))
+    pg.draw.circle(bb_img,(255,0,0),(10,10),10)
+    bb_img.set_colorkey((0,0,0))
+    bb_rect = bb_img.get_rect()
+    bb_rect.center = random.randint(0,WIDTH),random.randint(0,HEIGHT)
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
@@ -26,7 +32,7 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
-        screen.blit(bg_img, [0, 0]) 
+        screen.blit(bg_img, [0, 0])
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
@@ -45,6 +51,10 @@ def main():
     
         kk_rct.move_ip(sum_mv)
         screen.blit(kk_img, kk_rct)
+        vx = +5
+        vy = +5
+        bb_rect.move_ip(vx,vy)
+        screen.blit(bb_img,bb_rect)
         pg.display.update()
         tmr += 1
         clock.tick(50)
